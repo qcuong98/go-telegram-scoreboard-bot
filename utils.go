@@ -7,9 +7,10 @@ import (
 	"strings"
 )
 
-func showScores(scores map[string]int) string {
+func showScores(scores map[string]int, base int, inputN bool) string {
 	type scoreEntry struct {
 		Username string
+		Rank     int
 		Score    int
 	}
 
@@ -20,13 +21,51 @@ func showScores(scores map[string]int) string {
 
 	// Sort the slice in descending order based on the score
 	sort.Slice(entries, func(i, j int) bool {
-		return entries[i].Score > entries[j].Score
+		return entries[i].Score > entries[j].Score ||
+			(entries[i].Score == entries[j].Score && entries[i].Username > entries[j].Username)
 	})
+
+	rank := 0
+	for idx, entry := range entries {
+		if idx == 0 || entry.Score != entries[idx-1].Score {
+			rank = idx + 1
+		}
+		entries[idx].Rank = rank
+	}
 
 	msg := ""
 	msg = msg + "Scoreboard:\n"
-	for rank, entry := range entries {
-		msg = msg + fmt.Sprintf("#%d. %s: %d\n", rank+1, entry.Username, entry.Score)
+	for idx, entry := range entries {
+		x := entry.Score - base
+		emoji := "⚪️"
+		if entry.Rank == 1 {
+			emoji = "🥇"
+		} else if entry.Rank == 2 {
+			emoji = "🥈"
+		} else if entry.Rank == 3 {
+			emoji = "🥉"
+		} else if entry.Rank == entries[len(entries)-1].Rank {
+			emoji = "🌚"
+		} else if inputN {
+			if x > 0 {
+				emoji = "🟢"
+			} else if x == 0 {
+				emoji = "🟡"
+			} else if x < 0 {
+				emoji = "🔴"
+			}
+		} else {
+			emoji = "⚪️"
+		}
+
+		msg = msg + fmt.Sprintf("%v #%d. %s: %d\n", emoji, entry.Rank, entry.Username, entry.Score)
+		if idx < len(entries)-1 {
+			x := entry.Score - base
+			y := entries[idx+1].Score - base
+			if x*y <= 0 && (x != 0 || y != 0) {
+				msg = msg + fmt.Sprintf("-----\n")
+			}
+		}
 	}
 	return msg
 }
@@ -35,6 +74,8 @@ func addScores(scores map[string]int, users []string, increment int) {
 	for _, user := range users {
 		if score, ok := scores[user]; ok {
 			scores[user] = score + increment
+		} else {
+			scores[user] = increment
 		}
 	}
 }
@@ -43,6 +84,8 @@ func subScores(scores map[string]int, users []string, decrement int) {
 	for _, user := range users {
 		if score, ok := scores[user]; ok {
 			scores[user] = score - decrement
+		} else {
+			scores[user] = -decrement
 		}
 	}
 }
@@ -69,10 +112,11 @@ func initializeScores(scores map[string]int, users []string, presetScore int) []
 	return exist
 }
 
-func parseInput(input []string, defaultValue int) ([]string, int) {
+func parseInput(input []string, defaultValue int) ([]string, int, bool) {
 	// Extract usernames from input
 	usernames := []string{}
 	nUsers := 0
+	inputN := false
 
 	// Extract and parse the last item as the score
 	scoreStr := input[len(input)-1]
@@ -82,6 +126,7 @@ func parseInput(input []string, defaultValue int) ([]string, int) {
 		nUsers = len(input)
 	} else {
 		nUsers = len(input) - 1
+		inputN = true
 	}
 
 	for i := 0; i < nUsers; i++ {
@@ -97,7 +142,7 @@ func parseInput(input []string, defaultValue int) ([]string, int) {
 		}
 	}
 
-	return usernames, score
+	return usernames, score, inputN
 }
 
 func contains(slice []int64, item int64) bool {

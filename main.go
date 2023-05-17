@@ -108,7 +108,7 @@ func main() {
 			if len(args) < 1 || args[0] == "" {
 				msg.Text = "You need to provide a name"
 			} else {
-				usernames, score := parseInput(args, 0)
+				usernames, score, _ := parseInput(args, 0)
 				fmt.Printf("usernames, score: %v, %v\n", usernames, score)
 				initializeScores(scores, usernames, score)
 				fmt.Printf("scores, startScores: %v, %v\n", scores, startScores)
@@ -118,7 +118,7 @@ func main() {
 			if len(args) < 1 || args[0] == "" {
 				msg.Text = "You need to provide a name"
 			} else {
-				usernames, _ := parseInput(args, 0)
+				usernames, _, _ := parseInput(args, 0)
 				removeUsers(scores, usernames)
 				msg.Text = diffMaps(startScores, scores)
 			}
@@ -126,7 +126,7 @@ func main() {
 			if len(args) < 1 || args[0] == "" {
 				msg.Text = "You need to provide a name"
 			} else {
-				usernames, score := parseInput(args, 1)
+				usernames, score, _ := parseInput(args, 1)
 				addScores(scores, usernames, score)
 				msg.Text = diffMaps(startScores, scores)
 			}
@@ -134,7 +134,7 @@ func main() {
 			if len(args) < 1 || args[0] == "" {
 				msg.Text = "You need to provide a name"
 			} else {
-				usernames, score := parseInput(args, 1)
+				usernames, score, _ := parseInput(args, 1)
 				subScores(scores, usernames, score)
 				msg.Text = diffMaps(startScores, scores)
 			}
@@ -142,7 +142,12 @@ func main() {
 			scores = map[string]int{}
 			msg.Text = diffMaps(startScores, scores)
 		case "show":
-			msg.Text = showScores(scores)
+			base := 0
+			inputN := false
+			if len(args) >= 1 && args[0] != "" {
+				_, base, inputN = parseInput(args, 0)
+			}
+			msg.Text = showScores(scores, base, inputN)
 		default:
 			msg.Text = "I don't know that command"
 		}
