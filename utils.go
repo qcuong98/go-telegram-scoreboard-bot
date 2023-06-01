@@ -37,13 +37,9 @@ func showScores(scores map[string]int, base int, inputN bool) string {
 	msg = msg + "Scoreboard:\n"
 	for idx, entry := range entries {
 		x := entry.Score - base
-		emoji := "⚪️"
+		emoji := ""
 		if entry.Rank == 1 {
 			emoji = "🥇"
-		} else if entry.Rank == 2 {
-			emoji = "🥈"
-		} else if entry.Rank == 3 {
-			emoji = "🥉"
 		} else if entry.Rank == entries[len(entries)-1].Rank {
 			emoji = "🌚"
 		} else if inputN {
@@ -143,6 +139,14 @@ func parseInput(input []string, defaultValue int) ([]string, int, bool) {
 	}
 
 	return usernames, score, inputN
+}
+
+func sumScores(scores map[string]int) int {
+	sum := 0
+	for _, score := range scores {
+		sum += score
+	}
+	return sum
 }
 
 func contains(slice []int64, item int64) bool {

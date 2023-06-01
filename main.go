@@ -102,7 +102,7 @@ func main() {
 				"/add <name_1> <name_2> <score> (default: 1) \n" +
 				"/sub <name_1> <name_2> <score> (default: 1) \n" +
 				"/reset\n" +
-				"/show"
+				"/show <base> (default: 0)"
 
 		case "init":
 			if len(args) < 1 || args[0] == "" {
@@ -148,6 +148,8 @@ func main() {
 				_, base, inputN = parseInput(args, 0)
 			}
 			msg.Text = showScores(scores, base, inputN)
+		case "sum":
+			msg.Text = fmt.Sprintf("%v", sumScores(scores))
 		default:
 			msg.Text = "I don't know that command"
 		}
