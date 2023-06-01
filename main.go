@@ -102,8 +102,9 @@ func main() {
 				"/add <name_1> <name_2> <score> (default: 1) \n" +
 				"/sub <name_1> <name_2> <score> (default: 1) \n" +
 				"/reset\n" +
-				"/show <base> (default: 0)"
-
+				"/show <base> (default: avg)\n" +
+				"/sum\n" +
+				"/help"
 		case "init":
 			if len(args) < 1 || args[0] == "" {
 				msg.Text = "You need to provide a name"

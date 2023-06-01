@@ -19,6 +19,15 @@ func showScores(scores map[string]int, base int, inputN bool) string {
 		entries = append(entries, scoreEntry{Username: username, Score: score})
 	}
 
+	if inputN {
+		base = base * len(entries)
+	} else {
+		base = 0
+		for i := range entries {
+			base += entries[i].Score
+		}
+	}
+
 	// Sort the slice in descending order based on the score
 	sort.Slice(entries, func(i, j int) bool {
 		return entries[i].Score > entries[j].Score ||
@@ -36,28 +45,24 @@ func showScores(scores map[string]int, base int, inputN bool) string {
 	msg := ""
 	msg = msg + "Scoreboard:\n"
 	for idx, entry := range entries {
-		x := entry.Score - base
+		x := entry.Score*len(entries) - base
 		emoji := ""
 		if entry.Rank == 1 {
 			emoji = "🥇"
 		} else if entry.Rank == entries[len(entries)-1].Rank {
 			emoji = "🌚"
-		} else if inputN {
-			if x > 0 {
-				emoji = "🟢"
-			} else if x == 0 {
-				emoji = "🟡"
-			} else if x < 0 {
-				emoji = "🔴"
-			}
-		} else {
-			emoji = "⚪️"
+		} else if x > 0 {
+			emoji = "🟢"
+		} else if x == 0 {
+			emoji = "🟡"
+		} else if x < 0 {
+			emoji = "🔴"
 		}
 
 		msg = msg + fmt.Sprintf("%v #%d. %s: %d\n", emoji, entry.Rank, entry.Username, entry.Score)
 		if idx < len(entries)-1 {
-			x := entry.Score - base
-			y := entries[idx+1].Score - base
+			x := entry.Score*len(entries) - base
+			y := entries[idx+1].Score*len(entries) - base
 			if x*y <= 0 && (x != 0 || y != 0) {
 				msg = msg + fmt.Sprintf("-----\n")
 			}
