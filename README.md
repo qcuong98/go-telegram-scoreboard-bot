@@ -1,1 +1,3 @@
-# go-telegram-scoreboard-bot
+# TODO
+
+- [ ] Admin mode for edit commands
